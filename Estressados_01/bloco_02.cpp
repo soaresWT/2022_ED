@@ -15,6 +15,7 @@ std::vector<int> clone(const std::vector<int>& fila)
     }
     return clone;
 }
+   
 vector<int> pegar_homens(const std::vector<int>& fila)
 {
     std::vector<int> homens;
