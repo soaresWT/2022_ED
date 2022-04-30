@@ -29,6 +29,15 @@ int main()
     auto sword = next(lista.begin(), espada - 1);
     while (lista.size() > 1)
     {
+        show(lista, sword);
+        sword++;
+        if (sword == lista.end())
+            sword = lista.begin();
+
+        sword = lista.erase(sword);
+
+        if (sword == lista.end())
+            sword = lista.begin();
     }
     show(lista, sword);
 }
