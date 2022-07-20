@@ -15,54 +15,54 @@ struct Pos
 {
     int l;
     int c;
-    Pos(int l, int c) : l(l), c(c){};
+    Pos(int l, int c)
+    {
+        this->l = l;
+        this->c = c;
+    };
 };
 
-struct Pos
+bool verifica_limites(Pos pos, int linhas, int colunas)
 {
-    int l, c;
-
-    Pos(int l, int c) : l(l), c(c) {}
-};
-
-bool pode_queimar(vector<string> &mat, Pos p)
+    return pos.l >= 0 && pos.l < linhas && pos.c >= 0 && pos.c < colunas;
+}
+vector<Pos> pode_queimar(vector<string> &matriz, Pos v)
 {
-    if (p.first < 0 || p.first >= mat.size())
-        return false;
-    if (p.second < 0 || p.second >= mat[0].size())
-        return false;
-    return true;
+    vector<Pos> Queimar;
+    int nl = matriz.size();
+    int nc = matriz[0].size();
+
+    for (int i = 0; i < (int)v.size(); i++)
+    {
+        if (!verifica_limites(v[i], nl, nc))
+            return false;
+
+        if (matriz[v[i].l][v[i].c] != '#')
+            continue;
+
+        Queimar.push_back(v[i]);
+    }
+    return Queimar;
 }
 
 void queimar(vector<string> &mat, size_t l, size_t c)
 {
-    list<Pos> pilha;
+    stack<Pos> pilha;
     if (mat[l][c] != '#')
         return;
     mat[l][c] = 'o';
+
     pilha.push_back(make_pair(l, c));
     while (!pilha.empty())
     {
-        auto top = pilha.back();
-        vector<Pos> toburn;
-        for (auto neib : get_neib(top))
+        auto Queimar = pode_queimar(mat, pilha.front());
+        if (!Queimar.empty())
         {
-            if (pode_queimar(mat, neib) && (mat[neib.first][neib.second] == '#'))
-            {
-                toburn.push_back(neib);
-                break;
-            }
-        }
-        if (!toburn.empty())
-        {
-            auto neib = toburn.front();
+            auto neib = Queimar.front();
             mat[neib.first][neib.second] = 'o';
             pilha.push_back(neib);
         }
-        else
-        {
-            pilha.pop_back();
-        }
+        pilha.pop_back();
     }
 }
 
