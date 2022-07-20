@@ -4,72 +4,37 @@
 
 using namespace std;
 
-void emborcar(stack<int> &gaveta, stack<int> &prateleira)
+void Trocar(stack<int> &deposito, stack<int> &prateleira)
 {
-    while (!gaveta.empty())
+    while (!deposito.empty())
     {
-        prateleira.push(gaveta.top());
-        gaveta.pop();
+        prateleira.push(deposito.top());
+        deposito.pop();
     }
 }
 
 int main()
 {
-    stack<int> gaveta;
+    stack<int> deposito;
     stack<int> prateleira;
 
-    int q{0};
-    cin >> q;
-    cin.ignore();
-
-    while (q != 0)
+    cout << "Digite o numero de produtos a serem colocados no deposito: ";
+    int n = 0;
+    int comando = 0;
+    int elemento = 0;
+    cin >> n;
+    while (n > 0)
     {
-        string line;
-        getline(cin, line);
-        stringstream ss(line);
-        string cmd;
-        ss >> cmd;
-        if (cmd == "exit")
+        if (comando = 0)
         {
-            break;
+            cin >> x;
+            deposito.push(x);
         }
-        else if (cmd == "1")
-        {
-            int num{0};
-            ss >> num;
-            gaveta.push(num);
-            q--;
-        }
-        else if (cmd == "2")
-        {
-            if (prateleira.size() != 0)
-            {
-                prateleira.pop();
-            }
-            else
-            {
-                emborcar(gaveta, prateleira);
-                prateleira.pop();
-            }
-            q--;
-        }
-        else if (cmd == "3")
-        {
-            if (prateleira.empty())
-            {
-                emborcar(gaveta, prateleira);
-                cout << "Quem esta no topo: " << prateleira.top() << '\n';
-            }
-            else
-            {
-                cout << "Quem esta no topo: " << prateleira.top() << '\n';
-            }
-            q--;
-        }
-        else
-        {
-            cout << "fail: comando invalido" << '\n';
-        }
+        if (comando = 1)
+            Trocar(deposito, prateleira);
+
+        if (comando = 2)
+            cout << prateleira.top() << endl;
     }
     return 0;
 }
