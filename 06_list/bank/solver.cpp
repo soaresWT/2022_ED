@@ -45,11 +45,57 @@ struct Bank
     //  Roda o algoritmo de passagem de tempo
     void tic()
     {
-        tics++;
-        empty_queue_out();
-        for (int i = 0; i < (int)tellers.size(); i++)
-            process_teller(i);
-        decrease_patience();
+        if (!queue_out.empty())
+        {
+            for (auto it = queue_out.begin(); it != queue_out.end(); it++)
+            {
+                auto backup = it;
+                it = this->queue_out.erase(it);
+                delete *backup;
+            }
+        }
+
+        for (auto &elem : teller)
+        {
+            if (elem != nullptr)
+            {
+                if (elem->docs != 0)
+                {
+                    elem->docs--;
+                    this->received++;
+                }
+                else
+                {
+                    queue_out.push_back(elem);
+                    elem = nullptr;
+                }
+            }
+            else
+            {
+                if (!queue_in.empty())
+                {
+                    elem = queue_in.front();
+                    queue_in.pop_front();
+                }
+            }
+        }
+        auto it = this->queue_in.begin();
+        while (it != this->queue_in.end())
+        {
+            if ((*it)->patience > 0)
+            {
+                (*it)->patience--;
+                ++it;
+            }
+            else
+            {
+                auto client = *it;
+                queue_out.push_back(client);
+                it = queue_in.erase(it);
+                this->lost++;
+            }
+        }
+        this->tics++;
     }
 
     //  iniciliza os caixas com um vetor de nulls
@@ -78,10 +124,10 @@ struct Bank
     //  esta vazio se não tem ninguém no banco
     bool empty()
     {
-        for (auto *client : tellers)
-            if (client != nullptr)
-                return false;
-        return queue_in.empty() && queue_out.empty();
+        if (queue_in.empty())
+            return true;
+
+        return false;
     }
 
     //  Retirar todos os clientes da fila de saída
@@ -126,13 +172,10 @@ struct Bank
                 teller = nullptr;
             }
         }
-        else
+        else if (queue_in.size() > 0)
         {
-            if (queue_in.size() > 0)
-            {
-                teller = queue_in.front();
-                queue_in.pop_front();
-            }
+            teller = queue_in.front();
+            queue_in.pop_front();
         }
     }
 
@@ -167,16 +210,18 @@ struct Bank
             tic();
     }
 
-    // gera uma string com os dados dos banco
-    std::string str()
+    void show_all()
     {
-        std::stringstream ss;
-        for (auto client : tellers)
-            ss << "[" << (client == nullptr ? "" : client->str()) << "]";
-        ss << "\nin  :" << fmt(queue_in, "{", "}", " ");
-        ss << "\nout :" << fmt(queue_out, "{", "}", " ");
-        ss << "\ngain:" << docs_gain << " lost:" << docs_lost;
-        return ss.str();
+        for (auto client : teller)
+            cout << "[" << (client == nullptr ? "" : client->str()) << "]";
+
+        cout << "entrada: ";
+        for (auto client : queue_in)
+            cout << client->str() << " ";
+        cout << "saida: ";
+        for (auto client : queue_out)
+            cout << client->str() << " ";
+        cout << endl;
     }
 };
 
@@ -197,7 +242,7 @@ int main()
         }
         else if (cmd == "show")
         {
-            std::cout << banco.str() << "\n";
+            std::cout << banco.show() << "\n";
         }
         else if (cmd == "in")
         {
